@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>ERP-Zi | Student Login</title>
+    <title>ERP-Zi | Teacher Login</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap"
@@ -83,43 +83,6 @@
             height: 100px;
             margin-bottom: 1rem;
             filter: drop-shadow(0 0 10px #ffffff8a) drop-shadow(0 0 30px #ffffff);
-            cursor: pointer;
-            transition: transform 0.2s ease;
-            position: relative;
-        }
-
-        .logo-section img:hover {
-            transform: scale(1.05);
-        }
-
-        .logo-section img:active {
-            transform: scale(0.95);
-        }
-
-        .hold-progress {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: 3px solid var(--primary-color);
-            border-top: 3px solid transparent;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-        }
-
-        .hold-progress.active {
-            opacity: 1;
-            animation: spin 2s linear infinite;
-        }
-
-        .hold-progress.complete {
-            opacity: 1;
-            animation: none;
-            border-color: var(--success-color);
         }
 
         .logo-section h1 {
@@ -281,6 +244,26 @@
             }
         }
 
+        .back-link {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            background: var(--card-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .back-link:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-1px);
+        }
+
         @media (max-width: 480px) {
             .login-container {
                 margin: 1rem;
@@ -291,6 +274,8 @@
 </head>
 
 <body>
+    <a href="index.html" class="back-link">← Back to Student Login</a>
+
     <button class="theme-switcher" id="theme-switcher" aria-label="Toggle theme">
         <svg class="icon light-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="5"></circle>
@@ -310,31 +295,28 @@
 
     <div class="login-container">
         <div class="logo-section">
-            <div style="position: relative; display: inline-block;">
-                <img src="./ERP-Zi Logo.png" alt="ERP-Zi Logo" id="logoImage">
-                <div class="hold-progress" id="holdProgress"></div>
-            </div>
-            <h1 id="headertext">ERP-Zi</h1>
-            <p>Student Management System</p>
+            <img src="./ERP-Zi Logo.png" alt="ERP-Zi Logo">
+            <h1>ERP-Zi</h1>
+            <p>Teacher Portal</p>
         </div>
 
-        <form id="loginForm">
+        <form id="TeacherLoginForm">
             <div id="alertContainer"></div>
 
             <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" class="form-control" required
-                    placeholder="Enter your email">
+                <label for="TeacherEmail">Teacher Email</label>
+                <input type="email" id="TeacherEmail" name="TeacherEmail" class="form-control" required
+                    placeholder="Enter Teacher email">
             </div>
 
             <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" class="form-control" required
-                    placeholder="Enter your password">
+                <label for="TeacherPassword">Password</label>
+                <input type="password" id="TeacherPassword" name="TeacherPassword" class="form-control" required
+                    placeholder="Enter Teacher password">
             </div>
 
-            <button type="submit" class="btn" id="loginBtn">
-                Sign In
+            <button type="submit" class="btn" id="TeacherLoginBtn">
+                Teacher Sign In
             </button>
 
             <div class="loading" id="loading">
@@ -344,12 +326,10 @@
         </form>
 
         <div class="demo-credentials">
-            <h3>Demo Credentials</h3>
-            <p><strong>Student 1:</strong> johnathan.smith@university.edu / password123</p>
-            <p><strong>Student 2:</strong> emily.johnson@university.edu / emily2024</p>
-            <p><strong>Student 3:</strong> michael.brown@university.edu / mike123</p>
-            <p><strong>Student 4:</strong> sarah.davis@university.edu / sarah456</p>
-            <p><strong>Student 5:</strong> david.wilson@university.edu / david789</p>
+            <h3>Demo Teacher Credentials</h3>
+            <p><strong>Teacher 1:</strong> Teacher@erpzi.com / Teacher123</p>
+            <p><strong>Teacher 2:</strong> principal@erpzi.com / principal2024</p>
+            <p><strong>Teacher 3:</strong> director@erpzi.com / director456</p>
         </div>
     </div>
 
@@ -372,7 +352,7 @@
         }
 
         // ==========================================
-        // AUTHENTICATION
+        // Teacher AUTHENTICATION
         // ==========================================
         function showAlert(message, type = 'error') {
             const alertContainer = document.getElementById('alertContainer');
@@ -384,40 +364,45 @@
         }
 
         function showLoading(show = true) {
-            const loginBtn = document.getElementById('loginBtn');
+            const TeacherLoginBtn = document.getElementById('TeacherLoginBtn');
             const loading = document.getElementById('loading');
 
             if (show) {
-                loginBtn.style.display = 'none';
+                TeacherLoginBtn.style.display = 'none';
                 loading.style.display = 'block';
             } else {
-                loginBtn.style.display = 'block';
+                TeacherLoginBtn.style.display = 'block';
                 loading.style.display = 'none';
             }
         }
 
-        async function authenticateStudentLocal(email, password) {
+        // Demo Teacher credentials for testing
+        const TeacherCredentials = {
+            'Teacher@erpzi.com': 'Teacher123',
+            'principal@erpzi.com': 'principal2024',
+            'director@erpzi.com': 'director456'
+        };
+
+        async function authenticateTeacher(email, password) {
             try {
-                console.log('Attempting to authenticate:', email);
+                console.log('Attempting Teacher authentication:', email);
 
-                // Use the global authenticateStudent function from supabase-config.js
-                const student = await authenticateStudent(email, password);
+                // Check against demo credentials
+                if (TeacherCredentials[email] && TeacherCredentials[email] === password) {
+                    const Teacher = {
+                        id: 'Teacher_' + Date.now(),
+                        email: email,
+                        name: email.split('@')[0].replace('.', ' ').replace(/\b\w/g, l => l.toUpperCase()),
+                        role: 'Teacher'
+                    };
 
-                console.log('Authenticated student:', student);
-
-                if (!student) {
-                    throw new Error('Student not found');
+                    console.log('Teacher authenticated:', Teacher);
+                    return Teacher;
+                } else {
+                    throw new Error('Invalid Teacher credentials');
                 }
-
-                // Store student data in session storage
-                sessionStorage.setItem('currentStudent', JSON.stringify(student));
-                sessionStorage.setItem('isAuthenticated', 'true');
-
-                console.log('Student stored in session:', student.name, 'ID:', student.id);
-
-                return student;
             } catch (error) {
-                console.error('Authentication error:', error);
+                console.error('Teacher authentication error:', error);
                 throw error;
             }
         }
@@ -425,11 +410,11 @@
         // ==========================================
         // FORM HANDLING
         // ==========================================
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        document.getElementById('TeacherLoginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
+            const email = document.getElementById('TeacherEmail').value.trim();
+            const password = document.getElementById('TeacherPassword').value;
 
             if (!email || !password) {
                 showAlert('Please fill in all fields');
@@ -440,13 +425,17 @@
             showAlert(''); // Clear previous alerts
 
             try {
-                const student = await authenticateStudentLocal(email, password);
+                const Teacher = await authenticateTeacher(email, password);
 
-                showAlert(`Welcome back, ${student.name}! Redirecting to dashboard...`, 'success');
+                showAlert(`Welcome, ${Teacher.name}! Redirecting to Teacher dashboard...`, 'success');
 
-                // Redirect to student dashboard after a short delay
+                // Store Teacher data in session storage
+                sessionStorage.setItem('currentTeacher', JSON.stringify(Teacher));
+                sessionStorage.setItem('isTeacherAuthenticated', 'true');
+
+                // Redirect to teacher dashboard after a short delay
                 setTimeout(() => {
-                    window.location.href = 'student.html';
+                    window.location.href = 'teacher.html';
                 }, 1500);
 
             } catch (error) {
@@ -457,68 +446,14 @@
         });
 
         // ==========================================
-        // LOGO HOLD-TO-REDIRECT FUNCTIONALITY
-        // ==========================================
-        function initializeLogoHoldRedirect() {
-            const logoImage = document.getElementById('logoImage');
-            const holdProgress = document.getElementById('holdProgress');
-            let holdTimer = null;
-            let isHolding = false;
-
-            // Mouse events
-            logoImage.addEventListener('mousedown', startHold);
-            logoImage.addEventListener('mouseup', endHold);
-            logoImage.addEventListener('mouseleave', endHold);
-
-            // Touch events for mobile
-            logoImage.addEventListener('touchstart', startHold);
-            logoImage.addEventListener('touchend', endHold);
-            logoImage.addEventListener('touchcancel', endHold);
-
-            function startHold(e) {
-                e.preventDefault();
-                if (isHolding) return;
-
-                isHolding = true;
-                holdProgress.classList.add('active');
-
-                // Start the 2-second timer
-                holdTimer = setTimeout(() => {
-                    // Show completion state briefly
-                    holdProgress.classList.remove('active');
-                    holdProgress.classList.add('complete');
-
-                    // Redirect after a short delay
-                    setTimeout(() => {
-                        window.location.href = 'teacherauth.html';
-                    }, 300);
-                }, 2000);
-            }
-
-            function endHold(e) {
-                e.preventDefault();
-                if (!isHolding) return;
-
-                isHolding = false;
-                holdProgress.classList.remove('active', 'complete');
-
-                if (holdTimer) {
-                    clearTimeout(holdTimer);
-                    holdTimer = null;
-                }
-            }
-        }
-
-        // ==========================================
         // INITIALIZATION
         // ==========================================
         document.addEventListener('DOMContentLoaded', function () {
             initializeTheme();
-            initializeLogoHoldRedirect();
 
-            // Check if already authenticated
-            if (sessionStorage.getItem('isAuthenticated') === 'true') {
-                window.location.href = 'student.html';
+            // Check if already authenticated as Teacher
+            if (sessionStorage.getItem('isTeacherAuthenticated') === 'true') {
+                window.location.href = 'teacher.html';
             }
         });
     </script>
