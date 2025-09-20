@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Payment</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            padding: 2rem;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease-in-out;
+            box-sizing: border-box;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h2 {
+            color: #1c1e21;
+            margin: 0;
+            font-size: 1.75rem;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.85rem;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.9rem;
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .btn:disabled {
+            background-color: #5a9deb;
+            cursor: not-allowed;
+        }
+
+
+        /* QR Code Screen */
+        #qrContainer {
+            display: none;
+            text-align: center;
+        }
+
+        #qrCodeImage {
+            margin: 1.5rem 0;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 10px;
+            max-width: 200px;
+            height: auto;
+        }
+
+        .amount-display {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #343a40;
+            margin-bottom: 1rem;
+        }
+
+        .qr-instructions {
+            color: #6c757d;
+            margin-bottom: 2rem;
+        }
+
+
+        /* Receipt Screen */
+        #receiptContainer {
+            display: none;
+            padding: 2.5rem;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            background-color: #ffffff;
+        }
+
+        .receipt-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 1.5rem;
+        }
+
+        .receipt-header h3 {
+            margin: 0;
+            color: #007bff;
+            font-size: 1.5rem;
+        }
+
+        .receipt-status {
+            display: inline-block;
+            margin-top: 0.5rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-weight: 600;
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .receipt-details {
+            margin-bottom: 2rem;
+        }
+
+        .receipt-details p {
+            display: flex;
+            justify-content: space-between;
+            margin: 0.75rem 0;
+            color: #495057;
+            font-size: 0.95rem;
+        }
+
+        .receipt-details p strong {
+            color: #343a40;
+            font-weight: 600;
+        }
+
+        .amount-breakdown {
+            margin-top: 2rem;
+            border-top: 1px solid #e9ecef;
+            padding-top: 1.5rem;
+        }
+
+        .amount-breakdown .total {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .receipt-footer {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .print-btn {
+            margin-top: 1.5rem;
+        }
+
+        /* === NEW LOADER STYLES === */
+        #loaderOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: none;
+            /* Hidden by default */
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NEW: Loader Overlay -->
+    <div id="loaderOverlay">
+        <div class="spinner"></div>
+    </div>
+
+
+    <!-- Step 1: Payment Details Form -->
+    <div class="container" id="paymentContainer">
+        <div class="header">
+            <h2>Other Pay</h2>
+        </div>
+        <form id="paymentForm">
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" required>
+            </div>
+            <div class="form-group">
+                <label for="amount">Amount (INR)</label>
+                <input type="number" id="amount" required>
+            </div>
+            <button type="submit" class="btn" id="proceedBtn">Proceed to Pay</button>
+        </form>
+    </div>
+
+    <!-- Step 2: QR Code Display -->
+    <div class="container" id="qrContainer">
+        <div class="header">
+            <h2>Scan to Pay</h2>
+        </div>
+        <img id="qrCodeImage" src="" alt="QR Code">
+        <div class="amount-display" id="qrAmount"></div>
+        <p class="qr-instructions">Scan the QR code using any UPI app.</p>
+        <button id="confirmPaymentBtn" class="btn">Fetch Receipt</button>
+    </div>
+
+    <!-- Step 3: Receipt -->
+    <div class="container" id="receiptContainer">
+        <div class="receipt-header">
+            <h3>Payment Receipt</h3>
+            <span class="receipt-status" id="receiptStatus"></span>
+        </div>
+        <div class="receipt-details">
+            <p><strong>Order ID:</strong> <span id="orderId"></span></p>
+            <p><strong>Transaction ID:</strong> <span id="transactionId"></span></p>
+            <p><strong>Date:</strong> <span id="receiptDate"></span></p>
+            <p><strong>Paid To:</strong> <span>Other Pay Inc.</span></p>
+            <p><strong>Payment Method:</strong> <span>QR Code / UPI</span></p>
+        </div>
+        <div class="receipt-details">
+            <p><strong>Name:</strong> <span id="receiptName"></span></p>
+            <p><strong>Email:</strong> <span id="receiptEmail"></span></p>
+            <p><strong>Phone:</strong> <span id="receiptPhone"></span></p>
+        </div>
+        <div class="amount-breakdown">
+            <p><span>Base Amount:</span> <span id="baseAmount"></span></p>
+            <p><span>Taxes & Fees:</span> <span>₹0.00</span></p>
+            <p class="total"><strong>Total Paid:</strong> <strong id="receiptAmount"></strong></p>
+        </div>
+        <div class="receipt-footer">
+            <p>Thank you for your payment!</p>
+        </div>
+        <button onclick="window.print()" class="btn print-btn">Print Receipt</button>
+    </div>
+
+    <script>
+        // Store form data globally to access it in the second step
+        let paymentData = {};
+        const loader = document.getElementById('loaderOverlay');
+
+        document.getElementById('paymentForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            // --- NEW: Show loader and update button ---
+            const proceedBtn = document.getElementById('proceedBtn');
+            proceedBtn.disabled = true;
+            proceedBtn.innerText = 'Processing...';
+            loader.style.display = 'flex';
+
+            setTimeout(() => {
+                // Store form data
+                paymentData = {
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value,
+                    amount: document.getElementById('amount').value,
+                };
+
+                document.getElementById('qrCodeImage').src = "QR.png";
+                document.getElementById('qrAmount').innerText = '₹' + parseFloat(paymentData.amount).toFixed(2);
+
+                // --- NEW: Hide loader and switch containers ---
+                loader.style.display = 'none';
+                document.getElementById('paymentContainer').style.display = 'none';
+                document.getElementById('qrContainer').style.display = 'block';
+
+                // Restore button for potential back navigation
+                proceedBtn.disabled = false;
+                proceedBtn.innerText = 'Proceed to Pay';
+
+            }, 2000); // Simulate a 2-second processing delay
+        });
+
+        document.getElementById('confirmPaymentBtn').addEventListener('click', function () {
+
+            // --- NEW: Show loader and update button ---
+            const confirmBtn = this; // 'this' refers to the button being clicked
+            confirmBtn.disabled = true;
+            confirmBtn.innerText = 'Verifying Payment...';
+            loader.style.display = 'flex';
+
+            setTimeout(() => {
+                // Generate fake transaction details
+                const orderId = 'ORD' + new Date().getTime();
+                const transactionId = Math.floor(100000000000 + Math.random() * 900000000000).toString();
+
+                const paymentDate = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+                const amountFormatted = '₹' + parseFloat(paymentData.amount).toFixed(2);
+
+                // Populate receipt details
+                document.getElementById('orderId').innerText = orderId;
+                document.getElementById('transactionId').innerText = transactionId;
+                document.getElementById('receiptDate').innerText = paymentDate;
+                document.getElementById('receiptStatus').innerText = 'SUCCESSFUL';
+                document.getElementById('receiptName').innerText = paymentData.name;
+                document.getElementById('receiptEmail').innerText = paymentData.email;
+                document.getElementById('receiptPhone').innerText = paymentData.phone;
+                document.getElementById('baseAmount').innerText = amountFormatted;
+                document.getElementById('receiptAmount').innerText = amountFormatted;
+
+                // --- NEW: Hide loader and show receipt ---
+                loader.style.display = 'none';
+                document.getElementById('qrContainer').style.display = 'none';
+                document.getElementById('receiptContainer').style.display = 'block';
+
+                // Restore button
+                confirmBtn.disabled = false;
+                confirmBtn.innerText = 'Fetch Receipt';
+
+            }, 2500); // Simulate a 2.5-second verification delay
+        });
+    </script>
+
+</body>
+
+</html>
