@@ -2615,7 +2615,7 @@
                 // Check if user is authenticated
                 const isAuthenticated = sessionStorage.getItem('isAuthenticated');
                 if (!isAuthenticated) {
-                    window.location.href = 'login.html';
+                    window.location.href = '/';
                     return;
                 }
 
@@ -2624,7 +2624,7 @@
                 if (!studentData) {
                     // If no student data, redirect to login
                     console.error("No student data in session storage.");
-                    window.location.href = 'login.html';
+                    window.location.href = '/';
                     return;
                 }
 
@@ -2651,7 +2651,7 @@
 
             } catch (error) {
                 console.error('Error loading student data:', error);
-                window.location.href = 'login.html'; // Redirect to login on any error
+                window.location.href = '/'; // Redirect to login on any error
             }
         }
 
